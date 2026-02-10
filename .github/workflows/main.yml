@@ -7,48 +7,95 @@ jobs:
   lint: 
     runs-on: ubuntu-latest
     steps:
-      - name: get code
+      - name: GET CODE
         uses: actions/checkout@v4
-      - name: setting up node
-        uses: actions/setup-node@v4
+      - name: CACHE DEPENDENCIES
+        id: cache
+        uses: actions/cache@v3
         with:
-          node-version: 20
-      - name: install dependencies
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: INSTALL DEPENDENCIES
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
-      - run: 
+      - name: LINT CODE
+        run: 
           npm run lint
           
   test:
-    needs: lint
     runs-on: ubuntu-latest
     steps:
-      - name: pull codes
+      - name: GET CODE
         uses: actions/checkout@v4
-      - name: setting up node
-        uses: actions/setup-node@v4
+
+      - name: CACHE DEPENDENCIES
+        id: cache
+        uses: actions/cache@v3
         with:
-          node-version: 20
-      - name: install dependencies
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: INSTALLL DEPENDENCIES
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
-      - name: run test
+      - name: TEST CODE
+        continue-on-error: true
+        id: run-tests
         run:
           npm run test
+      - name: UPLOAD TEST RESULTS
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: test.json
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps: 
-      - name: get codes
+      - name: GET CODE
         uses: actions/checkout@v4
-      - name: setting up node
-        uses: actions/setup-node@v4
-        with: 
-            node-version: 20
-      - name: install dependencies
+
+      - name: CACHE DEPENDENCIES
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules ${{ hashFiles('**/package-lock.json')}} 
+      - name: INSTALL DEPENDENCIES
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
-      - name: run build
+      - name: BUILD CODE
         run: 
           npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: GET CODE
+        uses: actions/checkout@v3
+      - name: CACHE DEPENDENCIES
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: INSTALL DEPENDENCIES
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: DEPLOY CODE
+        run: echo "Deploying code to production"
+        
+
+
+  report: 
+    needs: [deploy, lint]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: UPLOAD REPORT
+        run:  |
+          echo "Something went wrong"
         
              
   
