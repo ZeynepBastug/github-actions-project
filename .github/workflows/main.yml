@@ -2,6 +2,7 @@ name: New Workflow Lint, Test, Deploy
 
 on: 
   push:
+  workflow_dispatch: 
 
 jobs:
   lint: 
@@ -34,7 +35,7 @@ jobs:
         with:
           path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
-      - name: INSTALLL DEPENDENCIES
+      - name: INSTALL DEPENDENCIES
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: TEST CODE
@@ -78,7 +79,6 @@ jobs:
     uses: ./.github/workflows/reusable-deploy.yml
     with:
       artifact-name: dist-files
-
 
   report: 
     needs: [deploy, lint]
