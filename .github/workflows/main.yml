@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
       - name: CACHE DEPENDENCIES
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
@@ -30,7 +30,7 @@ jobs:
 
       - name: CACHE DEPENDENCIES
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
@@ -43,7 +43,7 @@ jobs:
         run:
           npm run test
       - name: UPLOAD TEST RESULTS
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
           path: test.json
@@ -57,7 +57,7 @@ jobs:
 
       - name: CACHE DEPENDENCIES
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: deps-node-modules ${{ hashFiles('**/package-lock.json')}} 
@@ -73,10 +73,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: GET CODE
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: CACHE DEPENDENCIES
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
