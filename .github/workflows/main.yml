@@ -75,22 +75,9 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: GET CODE
-        uses: actions/checkout@v4
-      - name: CACHE DEPENDENCIES
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
-      - name: INSTALL DEPENDENCIES
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: npm ci
-      - name: DEPLOY CODE
-        run: echo "Deploying code to production"
-        
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      artifact-name: dist-files
 
 
   report: 
